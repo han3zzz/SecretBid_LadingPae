@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SecretBid — Sealed Auction Protocol on Rialo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+<!-- ══ INLINE SVG SPRITE — zero CDN, always works ══ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <!-- Lock -->
+  <symbol id="ic-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <!-- Eye off -->
+  <symbol id="ic-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></symbol>
+  <!-- Trophy -->
+  <symbol id="ic-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
+  <!-- Shield check -->
+  <symbol id="ic-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <!-- Rocket -->
+  <symbol id="ic-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+  <!-- Zap -->
+  <symbol id="ic-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+  <!-- Eye -->
+  <symbol id="ic-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <!-- Users -->
+  <symbol id="ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <!-- Arrow right -->
+  <symbol id="ic-arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <!-- Check circle -->
+  <symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <!-- Code -->
+  <symbol id="ic-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+  <!-- Bank -->
+  <symbol id="ic-bank" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></symbol>
+  <!-- Wallet -->
+  <symbol id="ic-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></symbol>
+  <!-- Link chain -->
+  <symbol id="ic-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <!-- Fire -->
+  <symbol id="ic-fire" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+  <!-- Refresh -->
+  <symbol id="ic-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <!-- Scale -->
+  <symbol id="ic-scale" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></symbol>
+  <!-- Chart -->
+  <symbol id="ic-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <!-- Chevron down -->
+  <symbol id="ic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+  <!-- Plus -->
+  <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <!-- Activity -->
+  <symbol id="ic-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+  <!-- Coin -->
+  <symbol id="ic-coin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9 8.5C9 7 10 6 12 6s3 1 3 2.5c0 1-1 2-3 2.5C10 11.5 9 12.5 9 14c0 1.5 1 2.5 3 2.5s3-1 3-2.5"/></symbol>
+  <!-- Award -->
+  <symbol id="ic-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></symbol>
+  <!-- Menu -->
+  <symbol id="ic-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></symbol>
+  <!-- X -->
+  <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+</svg>
+
+<style>
+/* ══ GOOGLE FONTS — preloaded above ══ */
+/* ══ DESIGN TOKENS ══ */
+:root{
+  --bg0:#F5F2EA;
+  --bg1:#FEFCF8;
+  --bg1s:#FFFFFF;
+  --bg2:#EEE9DF;
+  --bg3:#E4DDD3;
+  --bg4:#D8D0C4;
+  --glow:#009E8E;
+  --glow2:#5539B8;
+  --glow-lt:#00CCBA;
+  --gold:#C08A08;
+  --gold2:#9E6900;
+  --gold-lt:#F5C935;
+  --red:#CC2B58;
+  --blue:#1672BA;
+  --amber:#CC5508;
+  --purple:#7552B4;
+  --green:#0F7350;
+  --text:#0E0C08;
+  --text2:#3E3830;
+  --text3:#7E7568;
+  --text4:#B8B0A2;
+  --border:rgba(0,0,0,.07);
+  --border2:rgba(0,0,0,.13);
+  --border3:rgba(0,0,0,.22);
+  --r:18px;--r2:12px;--r3:999px;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 4px 20px rgba(0,0,0,.08),0 12px 40px rgba(0,0,0,.04);
+  --shadow2:0 4px 8px rgba(0,0,0,.06),0 16px 48px rgba(0,0,0,.14),0 32px 80px rgba(0,0,0,.06);
+  --shadow3:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.06);
+  --font-logo:'DM Serif Display',Georgia,serif;
+  --font-head:'Outfit',system-ui,-apple-system,sans-serif;
+  --font-body:'Outfit',system-ui,-apple-system,sans-serif;
+  --font-mono:'Space Mono','Courier New',monospace;
+  --font-display:'Cormorant Garamond','DM Serif Display',Georgia,serif;
+  --nav-h:66px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent;font-size:16px}
+body{
+  background:var(--bg0);color:var(--text);
+  font-family:var(--font-body);font-size:15px;line-height:1.65;
+  min-height:100vh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+  font-feature-settings:"kern" 1,"liga" 1;
+}
+
+/* Noise texture */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.022;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px;
+}
+
+/* ══ PARTICLE CANVAS ══ */
+#particle-canvas{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;
+}
+
+/* Animated orbs — enhanced */
+#orbs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform}
+.orb1{width:760px;height:760px;background:radial-gradient(circle,rgba(0,158,140,.13),transparent 70%);top:-240px;left:-120px;animation:orbDrift1 30s ease-in-out infinite alternate}
+.orb2{width:540px;height:540px;background:radial-gradient(circle,rgba(91,63,191,.10),transparent 70%);top:28%;right:-160px;animation:orbDrift2 22s ease-in-out infinite alternate}
+.orb3{width:480px;height:480px;background:radial-gradient(circle,rgba(200,150,10,.11),transparent 70%);bottom:-120px;left:28%;animation:orbDrift3 26s ease-in-out infinite alternate}
+@keyframes orbDrift1{from{transform:translate(0,0) scale(1)}to{transform:translate(55px,40px) scale(1.09)}}
+@keyframes orbDrift2{from{transform:translate(0,0) scale(1)}to{transform:translate(-45px,55px) scale(1.06)}}
+@keyframes orbDrift3{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,-35px) scale(1.08)}}
+
+/* Cursor glow */
+#cursor-glow{
+  position:fixed;width:480px;height:480px;border-radius:50%;
+  pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(0,158,140,.055),transparent 70%);
+  transform:translate(-50%,-50%);transition:opacity .5s ease;opacity:0;
+  will-change:left,top;
+}
+
+nav,#activity-ticker,#lp-content,footer{position:relative;z-index:1}
+
+/* SVG icon helper — fixed vertical alignment */
+.ico{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:1em;height:1em;flex-shrink:0;
+  vertical-align:middle;line-height:1;
+}
+.ico svg{width:100%;height:100%;display:block}
+.ico-sm{font-size:13px}.ico-md{font-size:18px}.ico-lg{font-size:22px}.ico-xl{font-size:28px}
+
+/* ══ NAVBAR ══ */
+nav{
+  height:var(--nav-h);
+  background:rgba(254,252,248,.90);
+  backdrop-filter:blur(40px) saturate(1.8);
+  -webkit-backdrop-filter:blur(40px) saturate(1.8);
+  border-bottom:1px solid rgba(0,0,0,.055);
+  display:flex;align-items:center;padding:0 2rem;gap:1rem;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 0 rgba(0,0,0,.04),0 4px 32px rgba(0,0,0,.035);
+  transition:background .3s,box-shadow .3s;
+}
+nav.scrolled{
+  background:rgba(254,252,248,.97);
+  box-shadow:0 1px 0 rgba(0,0,0,.07),0 8px 40px rgba(0,0,0,.06);
+}
+
+/* Brand */
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);flex-shrink:0}
+.brand-logo-wrap{position:relative;width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.brand-logo-wrap svg{
+  width:40px;height:40px;
+  transform-origin:85% 75%;
+  animation:hammerStrike 2.8s cubic-bezier(0.25,0.46,0.45,0.94) infinite;
+  filter:drop-shadow(0 2px 8px rgba(200,150,10,.38));
+  display:block;
+}
+@keyframes hammerStrike{
+  0%  {transform:scaleX(-1) rotate(-22deg)}
+  9%  {transform:scaleX(-1) rotate(18deg) scale(1.05)}
+  15% {transform:scaleX(-1) rotate(-6deg) scale(.97)}
+  22% {transform:scaleX(-1) rotate(12deg) scale(1.03)}
+  30% {transform:scaleX(-1) rotate(-1deg)}
+  42% {transform:scaleX(-1) rotate(0deg)}
+  100%{transform:scaleX(-1) rotate(-22deg)}
+}
+.brand-text{display:flex;flex-direction:column;gap:2px;line-height:1}
+.brand-name{
+  font-family:var(--font-logo);font-size:1.5rem;font-weight:400;
+  letter-spacing:.04em;line-height:1;
+  background:linear-gradient(125deg,var(--gold) 0%,var(--glow) 60%,var(--glow-lt) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  display:block;
+}
+.brand-sub{
+  font-size:8px;color:var(--text4);font-family:var(--font-mono);
+  letter-spacing:.12em;text-transform:uppercase;display:block;margin-top:1px;
+}
+
+/* Nav links */
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;justify-content:center}
+.nav-link{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:10px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  color:var(--text3);background:none;border:none;
+  white-space:nowrap;transition:color .2s,background .2s;
+  font-family:var(--font-body);letter-spacing:.01em;
+  text-decoration:none;line-height:1;
+}
+.nav-link:hover{color:var(--text);background:rgba(0,0,0,.05)}
+
+/* Nav right */
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.rex-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,rgba(0,158,140,.1),rgba(0,158,140,.06));
+  border:1px solid rgba(0,158,140,.18);
+  color:var(--glow);padding:5px 12px;border-radius:var(--r3);
+  font-size:11.5px;font-weight:700;font-family:var(--font-mono);
+  letter-spacing:.04em;line-height:1;
+}
+.rex-pulse{width:6px;height:6px;border-radius:50%;background:var(--glow);flex-shrink:0;animation:rxPulse 1.6s ease-in-out infinite}
+@keyframes rxPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* Magnetic button base */
+.connect-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--glow) 100%);
+  color:#fff;padding:8px 18px;border-radius:var(--r3);
+  font-size:13px;font-weight:700;font-family:var(--font-body);
+  border:none;cursor:pointer;
+  box-shadow:0 2px 12px rgba(0,158,140,.3);
+  text-decoration:none;letter-spacing:.02em;line-height:1;
+  position:relative;overflow:hidden;
+  transition:box-shadow .25s,transform .15s;
+}
+.connect-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 60%);
+  opacity:0;transition:opacity .25s;
+}
+.connect-btn:hover::before{opacity:1}
+.connect-btn:hover{box-shadow:0 6px 28px rgba(0,158,140,.42)}
+.connect-btn:active{transform:scale(.97)}
+
+.hamburger{display:none;background:none;border:none;cursor:pointer;color:var(--text);padding:6px;line-height:1}
+.mobile-menu{
+  display:none;flex-direction:column;
+  position:fixed;top:var(--nav-h);left:0;right:0;
+  background:rgba(254,252,248,.97);backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border2);
+  padding:12px 1.5rem 20px;z-index:99;box-shadow:var(--shadow2);
+}
+.mobile-menu.open{display:flex}
+.mobile-menu .nav-link{padding:14px 4px;border-bottom:1px solid var(--border);border-radius:0;font-size:15px}
+.mobile-menu .nav-link:last-child{border-bottom:none}
+
+/* ══ TICKER BAR ══ */
+#activity-ticker{
+  position:relative;z-index:99;width:100%;
+  background:linear-gradient(135deg,rgba(0,158,140,.07) 0%,rgba(91,63,191,.05) 50%,rgba(192,138,8,.06) 100%);
+  border-bottom:1px solid rgba(0,158,140,.13);
+  backdrop-filter:blur(20px);overflow:hidden;
+  height:36px;display:flex;align-items:center;
+}
+.ticker-left-fade{position:absolute;left:0;top:0;bottom:0;width:120px;background:linear-gradient(to right,var(--bg1) 0%,transparent 100%);z-index:2;pointer-events:none}
+.ticker-right-fade{position:absolute;right:0;top:0;bottom:0;width:120px;background:linear-gradient(to left,var(--bg1) 0%,transparent 100%);z-index:2;pointer-events:none}
+.ticker-live-badge{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);z-index:3;
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--red);color:#fff;
+  font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.1em;
+  padding:3px 8px;border-radius:4px;box-shadow:0 2px 10px rgba(204,43,88,.4);
+  line-height:1;
+}
+.ticker-live-dot{width:5px;height:5px;border-radius:50%;background:#fff;flex-shrink:0;animation:tdot 1.2s ease-in-out infinite}
+@keyframes tdot{0%,100%{opacity:1}50%{opacity:.3}}
+.ticker-track-wrap{flex:1;overflow:hidden;padding-left:84px}
+.ticker-track{display:flex;gap:0;width:max-content;animation:tickerScroll 50s linear infinite;will-change:transform}
+.ticker-track:hover{animation-play-state:paused}
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:0 22px;white-space:nowrap;
+  font-size:12px;font-family:var(--font-body);font-weight:500;
+  color:var(--text2);border-right:1px solid var(--border2);line-height:1;
+}
+.t-ico{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:11px;flex-shrink:0;line-height:1}
+.t-ico.bid{background:rgba(0,158,140,.12);color:var(--glow)}
+.t-ico.win{background:rgba(192,138,8,.12);color:var(--gold)}
+.t-ico.new{background:rgba(22,114,186,.12);color:var(--blue)}
+.t-ico.watch{background:rgba(91,63,191,.12);color:var(--purple)}
+.t-user{font-weight:700;color:var(--glow);font-family:var(--font-mono);font-size:11px}
+.t-amt{font-weight:700;color:var(--gold);font-family:var(--font-mono);font-size:11px}
+.t-sep{width:3px;height:3px;border-radius:50%;background:var(--border3);flex-shrink:0}
+
+/* ══ HERO ══ */
+.hero{
+  min-height:calc(100vh - var(--nav-h) - 36px);
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;
+  padding:80px 2rem 72px;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -5%,rgba(0,158,140,.08) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 80%,rgba(192,138,8,.06) 0%,transparent 50%),
+    radial-gradient(ellipse 50% 40% at 10% 70%,rgba(85,57,184,.05) 0%,transparent 50%);
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(254,252,248,.75);
+  border:1px solid rgba(0,158,140,.22);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  color:var(--glow);padding:7px 16px 7px 10px;border-radius:var(--r3);
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:30px;font-family:var(--font-mono);
+  box-shadow:0 2px 16px rgba(0,158,140,.12),0 1px 3px rgba(0,0,0,.04);
+  animation:fadeUp .6s cubic-bezier(.22,.68,0,1.2) both;
+  line-height:1;
+}
+.hero-h1{
+  font-family:var(--font-display);
+  font-size:clamp(48px,7.5vw,92px);
+  font-weight:600;line-height:1.03;letter-spacing:-.015em;
+  max-width:920px;margin:0 auto 10px;
+  animation:fadeUp .65s .09s cubic-bezier(.22,.68,0,1.2) both;
+  color:var(--text);
+}
+.hero-h1 .g-teal{
+  background:linear-gradient(128deg,var(--glow) 0%,var(--glow-lt) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  position:relative;
+}
+.hero-h1 .g-gold{
+  background:linear-gradient(128deg,var(--gold) 0%,var(--gold-lt) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-style:italic;
+}
+/* shimmer on hero text */
+.hero-h1 .g-teal::after{
+  content:attr(data-text);position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  background-size:200% 100%;
+  animation:shimmerText 3.5s 1.5s ease-in-out infinite;
+}
+@keyframes shimmerText{0%,100%{background-position:200% 0}50%{background-position:-200% 0}}
+.hero-sub{
+  font-size:clamp(15.5px,1.8vw,18.5px);color:var(--text3);
+  max-width:560px;margin:20px auto 46px;line-height:1.75;
+  animation:fadeUp .65s .18s cubic-bezier(.22,.68,0,1.2) both;
+  font-family:var(--font-body);
+}
+.hero-actions{
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp .65s .27s cubic-bezier(.22,.68,0,1.2) both;
+}
+/* ══ BUTTONS — magnetic & shimmer ══ */
+.btn-primary{
+  display:inline-flex;align-items:center;gap:9px;
+  background:linear-gradient(135deg,var(--glow) 0%,var(--glow2) 100%);
+  color:#fff;padding:14px 30px;border-radius:var(--r3);
+  font-size:15px;font-weight:700;font-family:var(--font-body);
+  text-decoration:none;border:none;cursor:pointer;
+  letter-spacing:.015em;line-height:1;
+  box-shadow:0 4px 24px rgba(0,158,140,.35),0 1px 3px rgba(0,0,0,.1);
+  position:relative;overflow:hidden;
+  transition:box-shadow .3s,transform .15s;
+}
+.btn-primary::before{
+  content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
+  transform:skewX(-18deg);animation:btnShimmer 2.8s 2s ease-in-out infinite;
+}
+@keyframes btnShimmer{0%{left:-75%}60%,100%{left:125%}}
+.btn-primary:hover{box-shadow:0 8px 36px rgba(0,158,140,.5),0 2px 6px rgba(0,0,0,.1)}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:9px;
+  background:rgba(254,252,248,.85);color:var(--text2);
+  padding:13px 28px;border-radius:var(--r3);
+  font-size:15px;font-weight:600;font-family:var(--font-body);
+  text-decoration:none;border:1.5px solid var(--border2);cursor:pointer;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  position:relative;overflow:hidden;line-height:1;
+  transition:background .25s,box-shadow .25s,transform .15s,border-color .25s;
+}
+.btn-secondary:hover{background:var(--bg1s);border-color:rgba(0,158,140,.3);box-shadow:0 4px 20px rgba(0,158,140,.12)}
+.btn-secondary:active{transform:scale(.97)}
+
+/* Hero stats */
+.hero-stats{
+  display:flex;flex-wrap:wrap;justify-content:center;
+  margin-top:68px;
+  background:rgba(254,252,248,.65);
+  border:1px solid var(--border2);border-radius:var(--r);
+  overflow:hidden;box-shadow:var(--shadow);
+  animation:fadeUp .65s .38s cubic-bezier(.22,.68,0,1.2) both;
+  width:100%;max-width:760px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  position:relative;
+}
+.hero-stats::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+  background:linear-gradient(90deg,transparent,var(--glow),var(--gold),var(--glow-lt),transparent);
+  animation:gradientShift 4s ease-in-out infinite;
+}
+@keyframes gradientShift{0%,100%{opacity:.7}50%{opacity:1}}
+.stat-item{
+  padding:28px 32px;border-right:1px solid var(--border);
+  text-align:center;flex:1;min-width:150px;
+  transition:background .25s;
+}
+.stat-item:hover{background:rgba(0,158,140,.04)}
+.stat-item:last-child{border-right:none}
+.stat-num{
+  display:block;font-family:var(--font-head);font-size:clamp(26px,3.2vw,42px);
+  font-weight:900;color:var(--text);line-height:1;margin-bottom:7px;letter-spacing:-.04em;
+}
+.stat-num.c-teal{
+  background:linear-gradient(128deg,var(--glow),var(--glow-lt));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.stat-num.c-gold{
+  background:linear-gradient(128deg,var(--gold),var(--gold-lt));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.stat-label{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.05em;text-transform:uppercase;font-family:var(--font-mono)}
+
+/* ══ TICKER STRIP ══ */
+.strip-wrap{
+  overflow:hidden;padding:11px 0;
+  background:linear-gradient(90deg,rgba(0,158,140,.035),rgba(192,138,8,.035),rgba(0,158,140,.035));
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.strip{display:flex;gap:44px;white-space:nowrap;animation:tickerScroll 40s linear infinite}
+.strip-item{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--text3);font-weight:500;flex-shrink:0;
+  font-family:var(--font-mono);letter-spacing:.02em;line-height:1;
+}
+.strip-item .ico{color:var(--glow)}
+
+/* ══ SECTION SHARED ══ */
+section{padding:96px 2rem}
+.sec-label{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--glow);margin-bottom:10px;font-family:var(--font-mono);line-height:1;
+}
+.sec-label::before{content:'';width:16px;height:1.5px;background:linear-gradient(90deg,var(--glow),var(--gold));border-radius:2px;flex-shrink:0}
+.sec-title{
+  font-family:var(--font-display);
+  font-size:clamp(28px,3.5vw,50px);
+  font-weight:600;line-height:1.06;letter-spacing:-.015em;
+  color:var(--text);margin-bottom:14px;
+}
+.sec-sub{
+  color:var(--text3);font-size:16px;max-width:500px;line-height:1.78;
+  margin-bottom:52px;
+}
+
+/* ══ HOW IT WORKS ══ */
+#how{background:var(--bg1)}
+.steps-inner{max-width:1080px;margin:0 auto}
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.step-card{
+  background:rgba(254,252,248,.72);
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:32px 28px 28px;
+  box-shadow:var(--shadow3);
+  opacity:0;transform:translateY(28px);
+  position:relative;overflow:hidden;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transition:transform .36s cubic-bezier(.22,.68,0,1.2),box-shadow .32s;
+}
+.step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px}
+.step-card:nth-child(1)::before{background:linear-gradient(90deg,var(--glow),var(--glow-lt))}
+.step-card:nth-child(2)::before{background:linear-gradient(90deg,var(--gold),var(--gold-lt))}
+.step-card:nth-child(3)::before{background:linear-gradient(90deg,var(--purple),var(--glow2))}
+.step-card:nth-child(4)::before{background:linear-gradient(90deg,var(--green),var(--glow))}
+/* shimmer overlay on hover */
+.step-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0) 40%,rgba(255,255,255,.06) 60%,rgba(255,255,255,0) 80%);
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.step-card:hover::after{opacity:1}
+.step-card.vis{animation:slideUp .55s cubic-bezier(.22,.68,0,1.2) forwards}
+.step-card:hover{transform:translateY(-7px);box-shadow:var(--shadow)}
+.step-num{
+  font-size:9px;font-weight:700;letter-spacing:.2em;
+  color:var(--text4);margin-bottom:16px;text-transform:uppercase;
+  font-family:var(--font-mono);
+}
+.step-icon{
+  width:50px;height:50px;border-radius:var(--r2);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:18px;font-size:22px;
+  transition:transform .3s;
+}
+.step-card:hover .step-icon{transform:scale(1.1) rotate(-3deg)}
+.si-teal{background:rgba(0,158,140,.1);color:var(--glow)}
+.si-gold{background:rgba(192,138,8,.1);color:var(--gold)}
+.si-purple{background:rgba(117,82,180,.1);color:var(--purple)}
+.si-green{background:rgba(15,115,80,.1);color:var(--green)}
+.step-title{
+  font-family:var(--font-head);font-size:17px;font-weight:700;
+  margin-bottom:10px;color:var(--text);letter-spacing:-.01em;line-height:1.25;
+}
+.step-desc{font-size:13.5px;color:var(--text3);line-height:1.75}
+.step-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:18px}
+.tag{
+  font-size:10px;font-weight:700;padding:3px 9px;border-radius:var(--r3);
+  font-family:var(--font-mono);letter-spacing:.03em;text-transform:uppercase;line-height:1.5;
+}
+.tag-teal{background:rgba(0,158,140,.1);color:var(--glow);border:1px solid rgba(0,158,140,.2)}
+.tag-gold{background:rgba(192,138,8,.1);color:var(--gold);border:1px solid rgba(192,138,8,.2)}
+.tag-purple{background:rgba(117,82,180,.1);color:var(--purple);border:1px solid rgba(117,82,180,.2)}
+
+/* ══ BIG STATS ══ */
+#bigstats{
+  background:var(--bg0);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.stats-band{
+  display:flex;flex-wrap:wrap;justify-content:center;
+  border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;
+  box-shadow:var(--shadow2);max-width:920px;margin:0 auto;
+  background:rgba(254,252,248,.65);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  position:relative;
+}
+.stats-band::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--glow),var(--gold),var(--glow-lt),var(--purple),var(--glow));
+  background-size:300% 100%;
+  animation:gradBandShift 5s linear infinite;
+}
+@keyframes gradBandShift{0%{background-position:0% 0}100%{background-position:300% 0}}
+.big-stat{
+  flex:1;min-width:180px;padding:50px 22px;
+  border-right:1px solid var(--border);text-align:center;
+  transition:background .25s;position:relative;
+}
+.big-stat:last-child{border-right:none}
+.big-stat:hover{background:rgba(0,158,140,.03)}
+.big-stat-num{
+  display:block;font-family:var(--font-head);
+  font-size:clamp(34px,3.8vw,58px);font-weight:900;
+  line-height:1;margin-bottom:9px;letter-spacing:-.04em;
+}
+.big-stat:nth-child(1) .big-stat-num{background:linear-gradient(128deg,var(--glow),var(--glow-lt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.big-stat:nth-child(2) .big-stat-num{background:linear-gradient(128deg,var(--gold),var(--gold-lt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.big-stat:nth-child(3) .big-stat-num{background:linear-gradient(128deg,var(--purple),var(--glow2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.big-stat:nth-child(4) .big-stat-num{background:linear-gradient(128deg,var(--green),var(--glow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.big-stat-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.07em;font-family:var(--font-mono)}
+
+/* ══ FEATURES ══ */
+#features{background:var(--bg1)}
+.features-inner{max-width:1080px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.feat-card{
+  background:rgba(254,252,248,.68);
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:28px;box-shadow:var(--shadow3);
+  opacity:0;
+  position:relative;overflow:hidden;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:transform .32s cubic-bezier(.22,.68,0,1.2),box-shadow .28s;
+}
+.feat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s}
+.feat-card:nth-child(1)::after,.feat-card:nth-child(5)::after{background:linear-gradient(90deg,var(--glow),var(--glow-lt))}
+.feat-card:nth-child(2)::after,.feat-card:nth-child(6)::after{background:linear-gradient(90deg,var(--gold),var(--gold-lt))}
+.feat-card:nth-child(3)::after,.feat-card:nth-child(7)::after{background:linear-gradient(90deg,var(--purple),var(--glow2))}
+.feat-card:nth-child(4)::after,.feat-card:nth-child(8)::after{background:linear-gradient(90deg,var(--green),var(--glow))}
+.feat-card.vis{animation:fadeIn .5s ease forwards}
+.feat-card:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.feat-card:hover::after{opacity:1}
+.feat-card:hover .feat-icon{transform:scale(1.12) rotate(-4deg)}
+.feat-icon{width:44px;height:44px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;margin-bottom:15px;font-size:19px;transition:transform .3s}
+.feat-title{font-family:var(--font-head);font-size:15px;font-weight:700;margin-bottom:8px;color:var(--text);letter-spacing:-.01em;line-height:1.25}
+.feat-desc{font-size:13px;color:var(--text3);line-height:1.75}
+
+/* ══ PRIVACY ══ */
+#privacy{
+  background:var(--bg0);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:76px;align-items:center;max-width:1060px;margin:0 auto}
+.check-list{list-style:none;display:flex;flex-direction:column;gap:14px;margin-top:28px}
+.check-list li{display:flex;align-items:flex-start;gap:12px;font-size:14.5px;color:var(--text3);line-height:1.68}
+.check-list .ico{color:var(--glow);margin-top:1px;font-size:16px;flex-shrink:0}
+.flow-box{
+  background:rgba(254,252,248,.8);
+  border:1px solid var(--border2);border-radius:var(--r);
+  padding:30px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.flow-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--glow),var(--gold),var(--glow-lt));background-size:200% 100%;animation:gradBandShift 4s linear infinite}
+.flow-hdr{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text4);margin-bottom:24px;display:flex;align-items:center;gap:6px;font-family:var(--font-mono);line-height:1}
+.flow-hdr .ico{color:var(--glow);font-size:13px}
+.flow-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.flow-row:last-of-type{border-bottom:none}
+.flow-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;animation:fdPulse 2.6s ease-in-out infinite}
+.fd-teal{background:var(--glow)}.fd-gold{background:var(--gold-lt)}.fd-purple{background:var(--purple)}
+@keyframes fdPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.55)}}
+.flow-label{font-size:12.5px;color:var(--text3);flex:1;font-weight:500}
+.flow-val{font-size:10px;font-family:var(--font-mono);font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap;line-height:1.6}
+.fv-teal{color:var(--glow);background:rgba(0,158,140,.1);border:1px solid rgba(0,158,140,.2)}
+.fv-gold{color:var(--gold2);background:rgba(192,138,8,.1);border:1px solid rgba(192,138,8,.2)}
+.flow-footer{margin-top:18px;padding:13px 15px;background:rgba(0,158,140,.06);border:1px solid rgba(0,158,140,.15);border-radius:var(--r2);display:flex;align-items:center;gap:8px}
+.flow-footer .ico{color:var(--glow);font-size:15px}
+.flow-footer span{font-size:12px;color:var(--glow);font-weight:700;font-family:var(--font-mono)}
+
+/* ══ TRUST ══ */
+#trust{background:var(--bg1)}
+.trust-inner{max-width:960px;margin:0 auto}
+.trust-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.trust-card{
+  background:rgba(254,252,248,.68);border:1px solid var(--border);
+  border-radius:var(--r);padding:30px 28px;box-shadow:var(--shadow3);
+  opacity:0;transform:translateY(18px);
+  position:relative;overflow:hidden;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:transform .32s cubic-bezier(.22,.68,0,1.2),box-shadow .28s;
+}
+.trust-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2.5px;opacity:0;transition:opacity .28s}
+.trust-card:nth-child(1)::before{background:linear-gradient(180deg,var(--glow),var(--glow-lt))}
+.trust-card:nth-child(2)::before{background:linear-gradient(180deg,var(--gold),var(--gold-lt))}
+.trust-card:nth-child(3)::before{background:linear-gradient(180deg,var(--purple),var(--glow2))}
+.trust-card.vis{animation:slideUp .52s cubic-bezier(.22,.68,0,1.2) forwards}
+.trust-card:hover{transform:translateY(-5px)!important;box-shadow:var(--shadow)}
+.trust-card:hover::before{opacity:1}
+.trust-card:hover .trust-ico{transform:scale(1.12)}
+.trust-ico{margin-bottom:15px;display:block;transition:transform .3s}
+.trust-card:nth-child(1) .trust-ico{color:var(--glow)}
+.trust-card:nth-child(2) .trust-ico{color:var(--gold)}
+.trust-card:nth-child(3) .trust-ico{color:var(--purple)}
+.trust-title{font-family:var(--font-head);font-size:16px;font-weight:700;margin-bottom:9px;letter-spacing:-.01em;line-height:1.25}
+.trust-desc{font-size:13px;color:var(--text3);line-height:1.75}
+
+/* ══ FAQ ══ */
+#faq{background:var(--bg0);border-top:1px solid var(--border)}
+.faq-wrap{max-width:700px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 0;cursor:pointer;font-size:15px;font-weight:600;
+  color:var(--text2);gap:16px;transition:color .2s;
+  background:none;border:none;width:100%;text-align:left;line-height:1.5;
+  font-family:var(--font-body);
+}
+.faq-q:hover{color:var(--glow)}
+.faq-arr{flex-shrink:0;color:var(--text4);transition:transform .35s cubic-bezier(.22,.68,0,1.2),color .2s;font-size:18px}
+.faq-item.open .faq-arr{transform:rotate(180deg);color:var(--glow)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.22,.68,0,1.2),padding .35s;font-size:14px;color:var(--text3);line-height:1.82}
+.faq-item.open .faq-a{max-height:320px;padding-bottom:22px}
+
+/* ══ CTA ══ */
+#cta{
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 50%,rgba(0,158,140,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 50% at 70% 50%,rgba(192,138,8,.06) 0%,transparent 60%),
+    var(--bg1);
+  text-align:center;
+  border-top:1px solid var(--border);
+}
+.cta-box{
+  max-width:720px;margin:0 auto;
+  background:rgba(254,252,248,.75);
+  border:1px solid var(--border2);border-radius:var(--r);
+  padding:76px 56px;position:relative;overflow:hidden;
+  box-shadow:var(--shadow2);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+}
+.cta-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--glow),var(--gold),var(--glow-lt));
+  background-size:200% 100%;animation:gradBandShift 4s linear infinite;
+}
+.cta-box::after{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(0,158,140,.07),transparent 70%);pointer-events:none}
+.cta-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(0,158,140,.08);border:1px solid rgba(0,158,140,.2);
+  color:var(--glow);padding:6px 14px 6px 10px;border-radius:var(--r3);
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:22px;font-family:var(--font-mono);line-height:1;
+}
+.cta-title{
+  font-family:var(--font-display);
+  font-size:clamp(26px,4vw,48px);font-weight:600;
+  letter-spacing:-.015em;line-height:1.06;margin-bottom:14px;color:var(--text);
+}
+.cta-sub{color:var(--text3);font-size:16px;margin-bottom:36px;line-height:1.75}
+.cta-pills{display:flex;align-items:center;justify-content:center;gap:26px;flex-wrap:wrap;margin-top:28px}
+.cta-pill{font-size:12.5px;color:var(--text3);display:inline-flex;align-items:center;gap:6px;line-height:1}
+
+/* ══ FOOTER ══ */
+footer{
+  padding:56px 2rem 32px;
+  background:var(--bg1);border-top:1px solid var(--border);
+}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;margin-bottom:40px;max-width:1080px;margin-left:auto;margin-right:auto}
+.footer-brand p{font-size:13px;color:var(--text3);margin-top:12px;line-height:1.75;max-width:250px}
+.footer-col h4{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text2);margin-bottom:14px;font-family:var(--font-mono)}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:10px}
+.footer-col a{color:var(--text3);text-decoration:none;font-size:13.5px;transition:color .2s}
+.footer-col a:hover{color:var(--glow)}
+.footer-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:22px;border-top:1px solid var(--border);flex-wrap:wrap;gap:12px;
+  max-width:1080px;margin:0 auto;
+}
+.footer-bottom p{font-size:12px;color:var(--text4);font-family:var(--font-mono)}
+.footer-badges{display:flex;gap:7px;flex-wrap:wrap}
+.f-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:var(--r3);background:var(--bg2);color:var(--text3);border:1px solid var(--border2);font-family:var(--font-mono)}
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{to{opacity:1}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.vis{opacity:1;transform:translateY(0)}
+
+code{
+  font-family:var(--font-mono);font-size:11px;font-weight:700;
+  background:rgba(0,158,140,.08);border:1px solid rgba(0,158,140,.15);
+  padding:2px 7px;border-radius:6px;color:var(--glow);
+}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:960px){
+  .nav-links{display:none}
+  .hamburger{display:block}
+  .two-col{grid-template-columns:1fr;gap:44px}
+  .footer-inner{grid-template-columns:1fr 1fr;gap:28px;margin-bottom:28px}
+}
+@media(max-width:600px){
+  .hero{padding:60px 1.5rem 56px}
+  .hero-stats{flex-direction:column}
+  .stat-item{border-right:none;border-bottom:1px solid var(--border);padding:20px}
+  .stat-item:last-child{border-bottom:none}
+  .steps-grid,.features-grid,.trust-grid{grid-template-columns:1fr}
+  .cta-box{padding:44px 24px}
+  .footer-inner{grid-template-columns:1fr;margin-bottom:24px}
+  .stats-band{flex-direction:column}
+  .big-stat{border-right:none;border-bottom:1px solid var(--border);padding:34px 18px}
+  .big-stat:last-child{border-bottom:none}
+  section{padding:68px 1.5rem}
+  #activity-ticker{height:32px}
+  .ticker-live-badge{font-size:8px;padding:2px 6px;left:8px}
+  .ticker-item{font-size:11px;padding:0 14px}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<!-- Particle canvas -->
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<!-- Animated orbs -->
+<div id="orbs" aria-hidden="true">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+<div id="cursor-glow" aria-hidden="true"></div>
+
+<!-- ══ NAVBAR ══ -->
+<nav id="main-nav">
+  <!-- Brand — exact gavel logo from app -->
+  <a class="nav-brand" href="#">
+    <div class="brand-logo-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="50 0 460 460" width="40" height="40">
+        <g><g>
+          <path fill="#6D453D" d="M362.724,258.882l-50.044,50.045l-5.591-5.921L210.78,201.06c-3.675-3.675-3.378-9.982,0.657-14.017l29.407-29.407c4.035-4.035,10.342-4.332,14.017-0.657l101.941,96.312L362.724,258.882z"/>
+          <path fill="#845245" d="M501.549,390.544c0.119,0.119,0.246,0.229,0.369,0.352c14.386,14.386,13.241,38.859-2.56,54.66c-15.801,15.801-40.275,16.946-54.66,2.56c-0.123-0.123-0.233-0.25-0.352-0.369c-0.653-0.373-1.263-0.822-1.814-1.373L314.976,311.36l-2.297-2.433l50.044-50.045l2.433,2.297l135.019,127.55C500.726,389.281,501.171,389.896,501.549,390.544z"/>
+          <path fill="#EAC16D" d="M270.393,136.571l-80.022,80.022c-2.52,2.52-6.604,2.52-9.124,0l-66.53-66.53c-2.519-2.52-2.519-6.604,0-9.124l80.022-80.022c2.52-2.52,6.604-2.52,9.124,0l66.53,66.53C272.912,129.966,272.912,134.051,270.393,136.571z"/>
+          <polygon fill="#EAC16D" points="365.157,261.18 314.976,311.36 312.679,308.927 307.089,303.006 356.802,253.292 362.724,258.882"/>
+          <path fill="#6D453D" d="M143.058,244.467c2.44-17.092,15.937-30.589,33.032-33.032l-51.598-51.598c-2.443,17.095-15.94,30.592-33.032,33.032L143.058,244.467z"/>
+          <path fill="#845245" d="M58.605,191.95l16.378-16.378c1.59-1.59,4.167-1.59,5.757,0l74.997,74.997c1.59,1.59,1.59,4.167,0,5.757l-16.378,16.378c-6.613,6.613-17.334,6.613-23.946,0l-56.808-56.808C51.992,209.284,51.992,198.563,58.605,191.95z"/>
+          <path fill="#845245" d="M162.258,249.806l-16.378,16.378c-1.59,1.59-4.167,1.59-5.757,0l-74.997-74.997c-1.59-1.59-1.59-4.167,0-5.757l16.378-16.378c6.613-6.613,17.334-6.613,23.946,0l56.808,56.808C168.87,232.472,168.87,243.193,162.258,249.806z"/>
+          <path fill="#BC9381" d="M151.466,260.597c1.024-1.024,1.024-2.685,0-3.71l-77.045-77.045c-1.024-1.024-2.685-1.024-3.709,0c-1.866,1.866-1.866,4.892,0,6.758l73.997,73.997C146.574,262.463,149.6,262.463,151.466,260.597z"/>
+          <path fill="#845245" d="M108.924,141.631l0.897-0.897c0.842-0.842,2.208-0.842,3.05,0l77.704,77.704c0.842,0.842,0.842,2.208,0,3.05l-0.897,0.897c-3.503,3.503-9.183,3.503-12.687,0l-68.068-68.068C105.42,150.814,105.42,145.134,108.924,141.631z"/>
+          <path fill="#6D453D" d="M246.515,37.815c-2.44,17.092-15.937,30.588-33.032,33.031l51.598,51.598c2.443-17.095,15.94-30.592,33.031-33.032L246.515,37.815z"/>
+          <path fill="#845245" d="M245.595,4.959l-16.378,16.378c-1.59,1.59-1.59,4.167,0,5.757l74.997,74.997c1.59,1.59,4.167,1.59,5.757,0l16.378-16.378c6.613-6.613,6.613-17.334,0-23.946L269.542,4.959C262.929-1.653,252.208-1.653,245.595,4.959z"/>
+          <path fill="#845245" d="M303.451,108.612l16.378-16.378c1.59-1.59,1.59-4.167,0-5.757L244.832,11.48c-1.59-1.59-4.167-1.59-5.757,0l-16.378,16.378c-6.613,6.613-6.613,17.334,0,23.947l56.808,56.808C286.117,115.225,296.839,115.225,303.451,108.612z"/>
+          <path fill="#BC9381" d="M314.243,97.821c-1.024,1.024-2.685,1.024-3.709,0l-77.045-77.045c-1.024-1.024-1.024-2.685,0-3.71c1.866-1.866,4.892-1.866,6.758,0l73.997,73.997C316.109,92.929,316.109,95.955,314.243,97.821z"/>
+          <path fill="#845245" d="M195.276,55.278l-0.897,0.897c-0.842,0.842-0.842,2.208,0,3.05l77.704,77.704c0.842,0.842,2.208,0.842,3.05,0l0.897-0.897c3.503-3.503,3.503-9.183,0-12.687l-68.068-68.068C204.46,51.775,198.78,51.775,195.276,55.278z"/>
+        </g></g>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name">SecretBid</span>
+      <span class="brand-sub">Built on Rialo</span>
+    </div>
+  </a>
+
+  <div class="nav-links">
+    <a href="#how" class="nav-link">
+      <svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      How It Works
+    </a>
+    <a href="#features" class="nav-link">
+      <svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+      Features
+    </a>
+    <a href="#privacy" class="nav-link">
+      <svg class="ico ico-sm"><use href="#ic-shield"/></svg>
+      Privacy
+    </a>
+    <a href="#faq" class="nav-link">
+      <svg class="ico ico-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      FAQ
+    </a>
+  </div>
+
+  <div class="nav-right">
+    <div class="rex-pill">
+      <div class="rex-pulse"></div>
+      REX Privacy
+    </div>
+    <a href="https://secretbid.vercel.app/" class="connect-btn">
+      <svg class="ico ico-sm"><use href="#ic-wallet"/></svg>
+      Launch App
+    </a>
+  </div>
+
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <svg class="ico" style="font-size:22px"><use href="#ic-menu"/></svg>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#how" class="nav-link">How It Works</a>
+  <a href="#features" class="nav-link">Features</a>
+  <a href="#privacy" class="nav-link">Privacy</a>
+  <a href="#faq" class="nav-link">FAQ</a>
+  <a href="https://secretbid.vercel.app/" class="nav-link" style="color:var(--glow)!important;font-weight:700">Launch App →</a>
+</div>
+
+
+
+<div id="lp-content">
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <svg class="ico ico-sm"><use href="#ic-lock"/></svg>
+    Sealed-Bid Auction Protocol
+  </div>
+  <h1 class="hero-h1">
+    Bid in <span class="g-teal">Secret.</span><br>
+    Win with <span class="g-gold">Proof.</span>
+  </h1>
+  <p class="hero-sub">The first fully on-chain, sealed-bid NFT auction built on Rialo. Your bids are cryptographically hidden until reveal — trustless, private, zero manipulation.</p>
+  <div class="hero-actions">
+    <a href="https://secretbid.vercel.app/" class="btn-primary">
+      <svg class="ico"><use href="#ic-rocket"/></svg> Launch App
+    </a>
+    <a href="#how" class="btn-secondary">
+      <svg class="ico"><use href="#ic-eye"/></svg> How It Works
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <span class="stat-num c-teal" data-count="3847">0</span>
+      <div class="stat-label">Total Auctions</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" data-count="12964">0</span>
+      <div class="stat-label">Sealed Bids</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num c-gold" data-count="100" data-suffix="%">0</span>
+      <div class="stat-label">On-Chain Settled</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">$0</span>
+      <div class="stat-label">Funds Misused</div>
+    </div>
+  </div>
+</section>
+
+<!-- Feature strip -->
+<div class="strip-wrap">
+  <div class="strip">
+    <div class="strip-item"><svg class="ico"><use href="#ic-shield"/></svg> Commit-Reveal Scheme</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-eye-off"/></svg> Bids Hidden Until Reveal</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-coin"/></svg> ETH Deposit Lock</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-users"/></svg> REX Privacy Relay</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-zap"/></svg> ZK Proof Verified</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-fire"/></svg> BidWar Heat Scanner</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-trophy"/></svg> Auto-Settle Winners</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-award"/></svg> Sealed Auction Protocol</div>
+    <!-- dupe -->
+    <div class="strip-item"><svg class="ico"><use href="#ic-shield"/></svg> Commit-Reveal Scheme</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-eye-off"/></svg> Bids Hidden Until Reveal</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-coin"/></svg> ETH Deposit Lock</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-users"/></svg> REX Privacy Relay</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-zap"/></svg> ZK Proof Verified</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-fire"/></svg> BidWar Heat Scanner</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-trophy"/></svg> Auto-Settle Winners</div>
+    <div class="strip-item"><svg class="ico"><use href="#ic-award"/></svg> Sealed Auction Protocol</div>
+  </div>
+</div>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section id="how">
+  <div class="steps-inner">
+    <div class="reveal">
+      <div class="sec-label">Protocol Flow</div>
+      <h2 class="sec-title">How SecretBid Works</h2>
+      <p class="sec-sub">Four cryptographic phases keep bids sealed on-chain — no trust required, no off-chain servers, no front-running.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">Phase 01</div>
+        <div class="step-icon si-teal"><svg class="ico ico-xl"><use href="#ic-lock"/></svg></div>
+        <div class="step-title">Commit Your Bid</div>
+        <p class="step-desc">Submit <code>keccak256(amount, nonce, address)</code> on-chain. Your actual bid stays completely hidden until the reveal window opens. A deposit locks your position.</p>
+        <div class="step-tags"><span class="tag tag-teal">On-Chain</span><span class="tag tag-teal">keccak256</span><span class="tag tag-teal">Deposit</span></div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Phase 02</div>
+        <div class="step-icon si-gold"><svg class="ico ico-xl"><use href="#ic-eye"/></svg></div>
+        <div class="step-title">Reveal Phase</div>
+        <p class="step-desc">After bidding closes, submit your plaintext amount + nonce. The contract verifies your hash matches. Invalid or missing reveals forfeit your deposit.</p>
+        <div class="step-tags"><span class="tag tag-gold">Verify Hash</span><span class="tag tag-gold">Highest Wins</span><span class="tag tag-gold">Nonce Key</span></div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Phase 03</div>
+        <div class="step-icon si-purple"><svg class="ico ico-xl"><use href="#ic-shield"/></svg></div>
+        <div class="step-title">REX Privacy Relay</div>
+        <p class="step-desc">Route your transactions through the REX relay to mask your identity. Zero-knowledge proofs verify bid validity without exposing your on-chain address.</p>
+        <div class="step-tags"><span class="tag tag-purple">ZK Proof</span><span class="tag tag-purple">REX Relay</span><span class="tag tag-purple">Anonymous</span></div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Phase 04</div>
+        <div class="step-icon si-green"><svg class="ico ico-xl"><use href="#ic-trophy"/></svg></div>
+        <div class="step-title">Auto Settlement</div>
+        <p class="step-desc">Winner pays the winning amount and receives the NFT. All losing bidders get full deposits refunded automatically. Excess deposit returned instantly.</p>
+        <div class="step-tags"><span class="tag tag-teal">Auto Refund</span><span class="tag tag-teal">Winner Claims</span><span class="tag tag-teal">On-Chain</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BIG STATS ══ -->
+<section id="bigstats">
+  <div class="reveal" style="text-align:center;margin-bottom:48px">
+    <div class="sec-label" style="justify-content:center">Live Protocol Metrics</div>
+    <h2 class="sec-title" style="text-align:center">Numbers Don't Lie</h2>
+  </div>
+  <div class="stats-band">
+    <div class="big-stat"><span class="big-stat-num" data-count="3847">0</span><div class="big-stat-label">Total Auctions</div></div>
+    <div class="big-stat"><span class="big-stat-num" data-count="12964">0</span><div class="big-stat-label">Sealed Bids</div></div>
+    <div class="big-stat"><span class="big-stat-num" data-count="2190">0</span><div class="big-stat-label">Unique Bidders</div></div>
+    <div class="big-stat"><span class="big-stat-num" data-count="98">0<span>%</span></span><div class="big-stat-label">Settlement Rate</div></div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section id="features">
+  <div class="features-inner">
+    <div class="reveal" style="margin-bottom:48px">
+      <div class="sec-label">Everything You Need</div>
+      <h2 class="sec-title">Built for Serious NFT Auctions</h2>
+      <p class="sec-sub">From private invite-only sales to open markets — with the same cryptographic guarantees.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon si-teal"><svg class="ico ico-md"><use href="#ic-lock"/></svg></div>
+        <div class="feat-title">Sealed Bid System</div>
+        <p class="feat-desc">All bids committed as keccak256 hashes. Zero front-running, zero shill bidding, zero last-second manipulation.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon si-gold"><svg class="ico ico-md"><use href="#ic-shield"/></svg></div>
+        <div class="feat-title">REX Privacy Relay</div>
+        <p class="feat-desc">Route transactions through the REX relay to hide your identity. ZK proofs confirm validity without revealing your address.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon si-purple"><svg class="ico ico-md"><use href="#ic-activity"/></svg></div>
+        <div class="feat-title">Public &amp; Private Modes</div>
+        <p class="feat-desc">Create open auctions or invite-only private sales with a wallet allowlist. Full control over who can participate.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon si-gold"><svg class="ico ico-md"><use href="#ic-fire"/></svg></div>
+        <div class="feat-title">BidWar Heat Scanner</div>
+        <p class="feat-desc">Real-time heat map showing auction activity, bid velocity, watcher count, and live pulse feed across all active auctions.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon si-teal"><svg class="ico ico-md"><use href="#ic-refresh"/></svg></div>
+        <div class="feat-title">Instant Auto-Refunds</div>
+        <p class="feat-desc">Losing bidders receive ETH deposits back automatically on settlement. Zero manual claims, zero risk of locked funds.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon si-purple"><svg class="ico ico-md"><use href="#ic-scale"/></svg></div>
+        <div class="feat-title">DAO Dispute Resolution</div>
+        <p class="feat-desc">File disputes within 48h of auction end. Rialo DAO reviews on-chain evidence and issues binding decisions within 72h.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon si-gold"><svg class="ico ico-md"><use href="#ic-chart"/></svg></div>
+        <div class="feat-title">Full Analytics Suite</div>
+        <p class="feat-desc">Auction charts, phase breakdowns, bidder leaderboards, and your complete bid history in one dashboard.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon si-teal"><svg class="ico ico-md"><use href="#ic-wallet"/></svg></div>
+        <div class="feat-title">Wallet-Native UX</div>
+        <p class="feat-desc">Connect via MetaMask or any Web3 wallet. All actions are signed transactions. Data cached locally — never uploaded to any server.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRIVACY ══ -->
+<section id="privacy">
+  <div class="two-col">
+    <div class="reveal">
+      <div class="sec-label">Zero-Knowledge Privacy</div>
+      <h2 class="sec-title">Your Bid Is a Secret Until You Reveal It</h2>
+      <p class="sec-sub" style="margin-bottom:0">SecretBid's commit-reveal scheme means your bid amount is never visible during the auction. The REX relay adds an identity layer — keeping your strategy entirely private.</p>
+      <ul class="check-list">
+        <li><svg class="ico"><use href="#ic-check"/></svg><span>Hash commitment locks bid on-chain without revealing the amount</span></li>
+        <li><svg class="ico"><use href="#ic-check"/></svg><span>ETH deposit proves intent — forfeited only on missing or invalid reveal</span></li>
+        <li><svg class="ico"><use href="#ic-check"/></svg><span>ZK proofs verify bids without exposing wallet address to anyone</span></li>
+        <li><svg class="ico"><use href="#ic-check"/></svg><span>REX relay masks transaction origin at the network level</span></li>
+        <li><svg class="ico"><use href="#ic-check"/></svg><span>No off-chain servers — every action lives entirely on Sepolia</span></li>
+      </ul>
+    </div>
+    <div class="flow-box reveal">
+      <div class="flow-hdr"><svg class="ico"><use href="#ic-activity"/></svg> Live Transaction Flow</div>
+      <div class="flow-row"><div class="flow-dot fd-teal" style="animation-delay:0s"></div><span class="flow-label">Bid Committed</span><span class="flow-val fv-teal">keccak256(amt+nonce)</span></div>
+      <div class="flow-row"><div class="flow-dot fd-teal" style="animation-delay:.3s"></div><span class="flow-label">Hash Stored On-Chain</span><span class="flow-val fv-teal">0x4f3c…a7d2</span></div>
+      <div class="flow-row"><div class="flow-dot fd-gold" style="animation-delay:.6s"></div><span class="flow-label">REX Relay Routes TX</span><span class="flow-val fv-gold">Identity Hidden</span></div>
+      <div class="flow-row"><div class="flow-dot fd-gold" style="animation-delay:.9s"></div><span class="flow-label">ZK Proof Generated</span><span class="flow-val fv-gold">Validity ✓</span></div>
+      <div class="flow-row"><div class="flow-dot fd-teal" style="animation-delay:1.2s"></div><span class="flow-label">Reveal Phase Opens</span><span class="flow-val fv-teal">Amount Verified</span></div>
+      <div class="flow-row"><div class="flow-dot fd-teal" style="animation-delay:1.5s"></div><span class="flow-label">Winner Auto-Settled</span><span class="flow-val fv-teal">NFT Transferred ✓</span></div>
+      <div class="flow-footer"><svg class="ico"><use href="#ic-shield"/></svg><span>Fully trustless — zero off-chain servers involved</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRUST ══ -->
+<section id="trust">
+  <div class="trust-inner">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <div class="sec-label" style="justify-content:center">Why SecretBid</div>
+      <h2 class="sec-title" style="text-align:center">Trustless by Design</h2>
+    </div>
+    <div class="trust-grid">
+      <div class="trust-card">
+        <span class="trust-ico"><svg class="ico ico-lg"><use href="#ic-bank"/></svg></span>
+        <div class="trust-title">No Custodian Risk</div>
+        <p class="trust-desc">SecretBid never holds your NFTs or ETH in a centralized vault. The smart contract is the escrow — auditable, immutable, publicly verifiable on Sepolia.</p>
+      </div>
+      <div class="trust-card">
+        <span class="trust-ico"><svg class="ico ico-lg"><use href="#ic-code"/></svg></span>
+        <div class="trust-title">Open Source Protocol</div>
+        <p class="trust-desc">Smart contracts and frontend are open source. Every line of logic governing your auction is readable, forkable, and independently auditable by anyone.</p>
+      </div>
+      <div class="trust-card">
+        <span class="trust-ico"><svg class="ico ico-lg"><use href="#ic-users"/></svg></span>
+        <div class="trust-title">DAO Governed</div>
+        <p class="trust-desc">Disputes, protocol upgrades, and fee parameters are governed by the Rialo DAO. No single party has unilateral control over the protocol.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ══ -->
+<section id="faq">
+  <div class="faq-wrap">
+    <div class="reveal" style="text-align:center;margin-bottom:48px">
+      <div class="sec-label" style="justify-content:center">Common Questions</div>
+      <h2 class="sec-title" style="text-align:center">FAQ</h2>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">What happens if I forget my nonce?<svg class="ico faq-arr"><use href="#ic-chevron"/></svg></button>
+      <div class="faq-a">If you forget your nonce, you cannot reveal your bid and your ETH deposit is forfeited. SecretBid lets you export all nonces from the My Bids tab — always back them up before bidding.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Can the auction creator see my bid?<svg class="ico faq-arr"><use href="#ic-chevron"/></svg></button>
+      <div class="faq-a">No. Your bid is stored on-chain only as a keccak256 hash. The creator, other bidders, and even the contract cannot determine your bid amount until you submit the reveal transaction.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">What is REX Privacy and do I need it?<svg class="ico faq-arr"><use href="#ic-chevron"/></svg></button>
+      <div class="faq-a">REX is an optional privacy relay that routes your transactions through a ZK proof system, masking your wallet address from other bidders. Recommended for high-value auctions where competitor tracking is a concern.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">What network does SecretBid run on?<svg class="ico faq-arr"><use href="#ic-chevron"/></svg></button>
+      <div class="faq-a">SecretBid currently operates on the Ethereum Sepolia testnet. Full on-chain functionality with test ETH. ERC-721 and ERC-1155 tokens are fully supported.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">How are losing bidders refunded?<svg class="ico faq-arr"><use href="#ic-chevron"/></svg></button>
+      <div class="faq-a">Refunds are fully automatic. When the auction is finalized, all non-winning bidders receive their ETH deposits back in the same transaction. No manual claim required.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Can I create a private auction with a whitelist?<svg class="ico faq-arr"><use href="#ic-chevron"/></svg></button>
+      <div class="faq-a">Yes. Switch to Private mode when creating and enter an allowlist of wallet addresses (one per line). Only those addresses can submit bids — useful for exclusive sales or collector communities.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section id="cta">
+  <div class="cta-box reveal">
+    <div class="cta-badge"><svg class="ico ico-sm"><use href="#ic-award"/></svg> Start Bidding Today</div>
+    <h2 class="cta-title">The Fairest Auction<br>on the Blockchain</h2>
+    <p class="cta-sub">No front-running. No shill bids. No surprises. Cryptographic proof and automatic settlement — the way auctions should work.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="https://secretbid.vercel.app/" class="btn-primary">
+        <svg class="ico"><use href="#ic-wallet"/></svg> Connect Wallet &amp; Start
+      </a>
+      <a href="https://secretbid.vercel.app/" class="btn-secondary">
+        <svg class="ico"><use href="#ic-plus"/></svg> Create an Auction
+      </a>
+    </div>
+    <div class="cta-pills">
+      <span class="cta-pill" style="color:var(--glow)"><svg class="ico ico-sm"><use href="#ic-shield"/></svg> Fully on-chain</span>
+      <span class="cta-pill" style="color:var(--gold)"><svg class="ico ico-sm"><use href="#ic-lock"/></svg> Zero custodian</span>
+      <span class="cta-pill" style="color:var(--green)"><svg class="ico ico-sm"><use href="#ic-refresh"/></svg> Auto-settle</span>
+    </div>
+  </div>
+</section>
+
+</div><!-- #lp-content -->
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="#">
+        <div class="brand-logo-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="50 0 460 460" width="40" height="40">
+            <g><g>
+              <path fill="#6D453D" d="M362.724,258.882l-50.044,50.045l-5.591-5.921L210.78,201.06c-3.675-3.675-3.378-9.982,0.657-14.017l29.407-29.407c4.035-4.035,10.342-4.332,14.017-0.657l101.941,96.312L362.724,258.882z"/>
+              <path fill="#845245" d="M501.549,390.544c0.119,0.119,0.246,0.229,0.369,0.352c14.386,14.386,13.241,38.859-2.56,54.66c-15.801,15.801-40.275,16.946-54.66,2.56c-0.123-0.123-0.233-0.25-0.352-0.369c-0.653-0.373-1.263-0.822-1.814-1.373L314.976,311.36l-2.297-2.433l50.044-50.045l2.433,2.297l135.019,127.55C500.726,389.281,501.171,389.896,501.549,390.544z"/>
+              <path fill="#EAC16D" d="M270.393,136.571l-80.022,80.022c-2.52,2.52-6.604,2.52-9.124,0l-66.53-66.53c-2.519-2.52-2.519-6.604,0-9.124l80.022-80.022c2.52-2.52,6.604-2.52,9.124,0l66.53,66.53C272.912,129.966,272.912,134.051,270.393,136.571z"/>
+              <polygon fill="#EAC16D" points="365.157,261.18 314.976,311.36 312.679,308.927 307.089,303.006 356.802,253.292 362.724,258.882"/>
+              <path fill="#6D453D" d="M143.058,244.467c2.44-17.092,15.937-30.589,33.032-33.032l-51.598-51.598c-2.443,17.095-15.94,30.592-33.032,33.032L143.058,244.467z"/>
+              <path fill="#845245" d="M58.605,191.95l16.378-16.378c1.59-1.59,4.167-1.59,5.757,0l74.997,74.997c1.59,1.59,1.59,4.167,0,5.757l-16.378,16.378c-6.613,6.613-17.334,6.613-23.946,0l-56.808-56.808C51.992,209.284,51.992,198.563,58.605,191.95z"/>
+              <path fill="#845245" d="M162.258,249.806l-16.378,16.378c-1.59,1.59-4.167,1.59-5.757,0l-74.997-74.997c-1.59-1.59-1.59-4.167,0-5.757l16.378-16.378c6.613-6.613,17.334-6.613,23.946,0l56.808,56.808C168.87,232.472,168.87,243.193,162.258,249.806z"/>
+              <path fill="#BC9381" d="M151.466,260.597c1.024-1.024,1.024-2.685,0-3.71l-77.045-77.045c-1.024-1.024-2.685-1.024-3.709,0c-1.866,1.866-1.866,4.892,0,6.758l73.997,73.997C146.574,262.463,149.6,262.463,151.466,260.597z"/>
+              <path fill="#845245" d="M108.924,141.631l0.897-0.897c0.842-0.842,2.208-0.842,3.05,0l77.704,77.704c0.842,0.842,0.842,2.208,0,3.05l-0.897,0.897c-3.503,3.503-9.183,3.503-12.687,0l-68.068-68.068C105.42,150.814,105.42,145.134,108.924,141.631z"/>
+              <path fill="#6D453D" d="M246.515,37.815c-2.44,17.092-15.937,30.588-33.032,33.031l51.598,51.598c2.443-17.095,15.94-30.592,33.031-33.032L246.515,37.815z"/>
+              <path fill="#845245" d="M245.595,4.959l-16.378,16.378c-1.59,1.59-1.59,4.167,0,5.757l74.997,74.997c1.59,1.59,4.167,1.59,5.757,0l16.378-16.378c6.613-6.613,6.613-17.334,0-23.946L269.542,4.959C262.929-1.653,252.208-1.653,245.595,4.959z"/>
+              <path fill="#845245" d="M303.451,108.612l16.378-16.378c1.59-1.59,1.59-4.167,0-5.757L244.832,11.48c-1.59-1.59-4.167-1.59-5.757,0l-16.378,16.378c-6.613,6.613-6.613,17.334,0,23.947l56.808,56.808C286.117,115.225,296.839,115.225,303.451,108.612z"/>
+              <path fill="#BC9381" d="M314.243,97.821c-1.024,1.024-2.685,1.024-3.709,0l-77.045-77.045c-1.024-1.024-1.024-2.685,0-3.71c1.866-1.866,4.892-1.866,6.758,0l73.997,73.997C316.109,92.929,316.109,95.955,314.243,97.821z"/>
+              <path fill="#845245" d="M195.276,55.278l-0.897,0.897c-0.842,0.842-0.842,2.208,0,3.05l77.704,77.704c0.842,0.842,2.208,0.842,3.05,0l0.897-0.897c3.503-3.503,3.503-9.183,0-12.687l-68.068-68.068C204.46,51.775,198.78,51.775,195.276,55.278z"/>
+            </g></g>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">SecretBid</span>
+          <span class="brand-sub">Built on Rialo</span>
+        </div>
+      </a>
+      <p>Sealed-bid NFT auctions built on the Rialo protocol. Privacy-first, on-chain, and trustless. Running on Sepolia testnet.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Protocol</h4>
+      <ul><li><a href="#">Smart Contract</a></li><li><a href="#">Documentation</a></li><li><a href="#">Security</a></li><li><a href="#">Audit Report</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h4>Community</h4>
+      <ul><li><a href="#">GitHub</a></li><li><a href="#">Twitter</a></li><li><a href="#">Discord</a></li><li><a href="#">Rialo DAO</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Use</a></li><li><a href="#">Disclaimer</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 SecretBid · Built on Rialo · No warranties. Use at your own risk.</p>
+    <div class="footer-badges">
+      <span class="f-badge">Sepolia Testnet</span>
+      <span class="f-badge">REX Privacy v2.1</span>
+      <span class="f-badge">ERC-721 / ERC-1155</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ══ PARTICLE SYSTEM ══
+(function(){
+  const canvas=document.getElementById('particle-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,particles=[];
+  
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+  resize();
+  window.addEventListener('resize',resize);
+  
+  const COLORS=['rgba(0,158,140,', 'rgba(192,138,8,', 'rgba(91,63,191,'];
+  
+  function Particle(){
+    this.x=Math.random()*W;
+    this.y=Math.random()*H;
+    this.r=Math.random()*1.5+.4;
+    this.vx=(Math.random()-.5)*.25;
+    this.vy=(Math.random()-.5)*.25;
+    this.alpha=Math.random()*.35+.05;
+    this.color=COLORS[Math.floor(Math.random()*COLORS.length)];
+  }
+  Particle.prototype.update=function(){
+    this.x+=this.vx;this.y+=this.vy;
+    if(this.x<0)this.x=W;if(this.x>W)this.x=0;
+    if(this.y<0)this.y=H;if(this.y>H)this.y=0;
+  };
+  
+  const COUNT=Math.min(60,Math.floor(W*H/18000));
+  for(let i=0;i<COUNT;i++)particles.push(new Particle());
+  
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.update();
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color+p.alpha+')';
+      ctx.fill();
+    });
+    // draw connections
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x;
+        const dy=particles[i].y-particles[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<110){
+          ctx.beginPath();
+          ctx.strokeStyle='rgba(0,158,140,'+(0.055*(1-dist/110))+')';
+          ctx.lineWidth=.6;
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches) draw();
+})();
+
+// ══ NAV SCROLL STATE ══
+const mainNav=document.getElementById('main-nav');
+window.addEventListener('scroll',()=>{
+  mainNav.classList.toggle('scrolled',window.scrollY>20);
+},{passive:true});
+
+// ══ HAMBURGER ══
+const ham=document.getElementById('hamburger');
+const mob=document.getElementById('mobileMenu');
+ham.addEventListener('click',()=>{
+  mob.classList.toggle('open');
+  const use=ham.querySelector('use');
+  use.setAttribute('href',mob.classList.contains('open')?'#ic-x':'#ic-menu');
+});
+mob.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
+  mob.classList.remove('open');
+  ham.querySelector('use').setAttribute('href','#ic-menu');
+}));
+
+// ══ CURSOR GLOW ══
+const cg=document.getElementById('cursor-glow');
+let cgX=0,cgY=0,targetX=0,targetY=0;
+document.addEventListener('mousemove',e=>{
+  targetX=e.clientX;targetY=e.clientY;cg.style.opacity='1';
+},{passive:true});
+document.addEventListener('mouseleave',()=>cg.style.opacity='0');
+(function animateCursor(){
+  cgX+=(targetX-cgX)*.08;cgY+=(targetY-cgY)*.08;
+  cg.style.left=cgX+'px';cg.style.top=cgY+'px';
+  requestAnimationFrame(animateCursor);
+})();
+
+// ══ MAGNETIC BUTTONS ══
+document.querySelectorAll('.btn-primary,.btn-secondary,.connect-btn').forEach(btn=>{
+  btn.addEventListener('mousemove',e=>{
+    const r=btn.getBoundingClientRect();
+    const x=e.clientX-r.left-r.width/2;
+    const y=e.clientY-r.top-r.height/2;
+    btn.style.transform=`translate(${x*.18}px,${y*.18}px)`;
+  });
+  btn.addEventListener('mouseleave',()=>btn.style.transform='');
+});
+
+// ══ COUNT UP ══
+function countUp(el){
+  const target=parseInt(el.dataset.count,10);
+  const suffix=el.dataset.suffix||'';
+  const dur=2400;const start=performance.now();
+  const inner=el.querySelector('span');
+  function tick(now){
+    const t=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-t,4);
+    const val=Math.round(ease*target);
+    if(inner)el.childNodes[0].textContent=val.toLocaleString()+suffix;
+    else el.textContent=val.toLocaleString()+suffix;
+    if(t<1)requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ══ INTERSECTION OBSERVER ══
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    const el=e.target;
+    if(el.classList.contains('reveal'))el.classList.add('vis');
+    if(el.classList.contains('step-card')||el.classList.contains('trust-card')||el.classList.contains('feat-card')){
+      const idx=Array.from(el.parentElement.children).indexOf(el);
+      setTimeout(()=>el.classList.add('vis'),idx*100);
+    }
+    if(el.dataset.count!==undefined)countUp(el);
+    io.unobserve(el);
+  });
+},{threshold:0.12});
+document.querySelectorAll('.reveal,.step-card,.trust-card,.feat-card').forEach(el=>io.observe(el));
+document.querySelectorAll('[data-count]').forEach(el=>io.observe(el));
+
+// ══ FAQ ══
+document.querySelectorAll('.faq-q').forEach(q=>{
+  q.addEventListener('click',()=>{
+    const item=q.parentElement;
+    const open=item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+    if(!open)item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
