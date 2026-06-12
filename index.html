@@ -191,7 +191,7 @@ nav.scrolled{
   42% {transform:scaleX(-1) rotate(0deg)}
   100%{transform:scaleX(-1) rotate(-22deg)}
 }
-.brand-text{display:flex;flex-direction:column;gap:2px;line-height:1}
+.brand-text{margin-left: 25px;display:flex;flex-direction:column;gap:2px;line-height:1}
 .brand-name{
   font-family:var(--font-logo);font-size:1.5rem;font-weight:400;
   letter-spacing:.04em;line-height:1;
@@ -736,28 +736,134 @@ code{
 }
 
 /* ══ RESPONSIVE ══ */
+
+/* Tablet — 960px */
 @media(max-width:960px){
   .nav-links{display:none}
   .hamburger{display:block}
   .two-col{grid-template-columns:1fr;gap:44px}
   .footer-inner{grid-template-columns:1fr 1fr;gap:28px;margin-bottom:28px}
+  .features-grid{grid-template-columns:repeat(2,1fr)}
+  .trust-grid{grid-template-columns:repeat(2,1fr) !important}
 }
-@media(max-width:600px){
-  .hero{padding:60px 1.5rem 56px}
-  .hero-stats{flex-direction:column}
-  .stat-item{border-right:none;border-bottom:1px solid var(--border);padding:20px}
+
+/* Large mobile — 640px */
+@media(max-width:640px){
+  :root{--nav-h:58px}
+
+  /* NAV */
+  nav{padding:0 1.25rem;gap:.75rem}
+  .brand-name{font-size:1.3rem}
+  .brand-sub{display:none}
+  .rex-pill{display:none}
+  .connect-btn{padding:7px 14px;font-size:12px;gap:5px}
+
+  /* TICKER */
+  #activity-ticker{height:30px}
+  .ticker-live-badge{font-size:8px;padding:2px 6px;left:8px;gap:3px}
+  .ticker-track-wrap{padding-left:72px}
+  .ticker-item{font-size:11px;padding:0 14px;gap:5px}
+
+  /* HERO */
+  .hero{
+    padding:56px 1.25rem 52px;
+    min-height:calc(100svh - var(--nav-h) - 30px);
+  }
+  .hero-eyebrow{font-size:9.5px;padding:6px 12px 6px 8px;margin-bottom:22px;letter-spacing:.09em}
+  .hero-h1{letter-spacing:-.02em;margin-bottom:6px}
+  .hero-sub{font-size:15px;margin:16px auto 36px;max-width:100%}
+  .hero-actions{gap:10px;flex-direction:column;align-items:center}
+  .hero-actions .btn-primary,
+  .hero-actions .btn-secondary{width:100%;max-width:320px;justify-content:center}
+
+  /* HERO STATS */
+  .hero-stats{
+    flex-direction:column;margin-top:44px;
+    border-radius:var(--r2);
+  }
+  .stat-item{
+    border-right:none;border-bottom:1px solid var(--border);
+    padding:18px 20px;display:flex;align-items:center;gap:14px;text-align:left;
+  }
   .stat-item:last-child{border-bottom:none}
-  .steps-grid,.features-grid,.trust-grid{grid-template-columns:1fr}
-  .cta-box{padding:44px 24px}
-  .footer-inner{grid-template-columns:1fr;margin-bottom:24px}
-  .stats-band{flex-direction:column}
-  .big-stat{border-right:none;border-bottom:1px solid var(--border);padding:34px 18px}
+  .stat-num{font-size:clamp(24px,7vw,32px);margin-bottom:0;flex-shrink:0}
+  .stat-label{font-size:10.5px}
+
+  /* STRIP */
+  .strip-item{font-size:11px;gap:6px}
+
+  /* SECTIONS */
+  section{padding:60px 1.25rem}
+  .sec-title{margin-bottom:10px}
+  .sec-sub{font-size:14.5px;margin-bottom:36px}
+
+  /* HOW IT WORKS */
+  .steps-grid{grid-template-columns:1fr;gap:12px}
+  .step-card{padding:24px 20px 20px}
+  .step-icon{width:44px;height:44px;font-size:20px;margin-bottom:14px}
+  .step-title{font-size:16px}
+
+  /* BIG STATS */
+  .stats-band{flex-direction:column;border-radius:var(--r2)}
+  .big-stat{
+    border-right:none;border-bottom:1px solid var(--border);
+    padding:22px 20px;display:flex;align-items:center;gap:14px;text-align:left;
+  }
   .big-stat:last-child{border-bottom:none}
-  section{padding:68px 1.5rem}
-  #activity-ticker{height:32px}
-  .ticker-live-badge{font-size:8px;padding:2px 6px;left:8px}
-  .ticker-item{font-size:11px;padding:0 14px}
+  .big-stat-num{font-size:clamp(30px,8vw,40px);margin-bottom:0;flex-shrink:0}
+  .big-stat-label{font-size:10.5px}
+
+  /* FEATURES */
+  .features-grid{grid-template-columns:1fr;gap:10px}
+  .feat-card{padding:22px 18px}
+  .feat-icon{width:38px;height:38px;font-size:17px;margin-bottom:12px}
+
+  /* PRIVACY */
+  .two-col{grid-template-columns:1fr;gap:32px}
+  .flow-box{padding:22px 18px}
+  .flow-row{padding:10px 0}
+  .flow-val{font-size:9px;padding:2px 6px}
+
+  /* TRUST */
+  .trust-grid{grid-template-columns:1fr !important;gap:10px}
+  .trust-card{padding:22px 18px}
+
+  /* FAQ */
+  .faq-q{font-size:14px;padding:17px 0}
+  .faq-a{font-size:13.5px}
+
+  /* CTA */
+  #cta{padding:60px 1.25rem}
+  .cta-box{padding:40px 20px;border-radius:var(--r2)}
+  .cta-title{font-size:clamp(22px,6.5vw,32px)}
+  .cta-sub{font-size:14.5px;margin-bottom:28px}
+  .cta-pills{gap:14px}
+  .cta-pill{font-size:12px}
+  #cta [style*="display:flex"]{flex-direction:column;align-items:center}
+  #cta .btn-primary,#cta .btn-secondary{width:100%;max-width:320px;justify-content:center}
+
+  /* FOOTER */
+  footer{padding:44px 1.25rem 28px}
+  .footer-inner{grid-template-columns:1fr;gap:32px;margin-bottom:28px}
+  .footer-brand p{max-width:100%}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:10px}
+  .footer-badges{gap:5px}
+  .f-badge{font-size:9px}
 }
+
+/* Small mobile — 380px */
+@media(max-width:380px){
+  .hero-h1{font-size:clamp(36px,11vw,48px)}
+  .brand-name{font-size:1.15rem}
+  .connect-btn{padding:6px 11px;font-size:11.5px}
+  .btn-primary,.btn-secondary{padding:12px 20px;font-size:14px}
+  section{padding:52px 1rem}
+  .cta-box{padding:32px 16px}
+  #cta{padding:52px 1rem}
+  footer{padding:36px 1rem 24px}
+  nav{padding:0 1rem}
+}
+
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -846,7 +952,6 @@ code{
   <a href="#faq" class="nav-link">FAQ</a>
   <a href="https://secretbid.vercel.app/" class="nav-link" style="color:var(--glow)!important;font-weight:700">Launch App →</a>
 </div>
-
 
 
 <div id="lp-content">
